@@ -1,0 +1,71 @@
+
+const uint8_t digits[10] = {
+    0x3F,   //0
+    0x06,   //1
+    0x5B,   //2
+    0x4F,   //3
+    0x66,   //4
+    0x6D,   //5
+    0x7D,   //6
+    0x07,   //7
+    0x7F,   //8
+    0x6F    //9
+   };
+
+static const uint8_t alphabet_upper[26] = {
+    0x77,   //A
+    0x7C,   //B l
+    0x39,   //C
+    0x5E,   //D l
+    0x79,   //E
+    0x71,   //F
+    0x00,   //G X
+    0x76,   //H
+    0x06,   //I
+    0x1E,   //J
+    0x00,   //K X
+    0x38,   //L
+    0x00,   //M X
+    0x54,   //N l
+    0x3F,   //O
+    0x73,   //P
+    0x00,   //Q X
+    0x00,   //R X
+    0x6D,   //S
+    0x78,   //T l
+    0x3E,   //U
+    0x00,   //V X
+    0x00,   //W X
+    0x00,   //X X
+    0x00,   //Y X
+    0x00    //Z X
+};
+
+static const uint8_t alphabet_lower[26] = {
+    0x77,   //A U
+    0x7C,   //B U
+    0x58,   //C
+    0x5E,   //D U
+    0x79,   //E U
+    0x71,   //F U
+    0x00,   //G X
+    0x74,   //H
+    0x04,   //I
+    0x1E,   //J U
+    0x00,   //K X
+    0x06,   //L
+    0x00,   //M X
+    0x54,   //N
+    0x5C,   //O
+    0x73,   //P U
+    0x00,   //Q X
+    0x00,   //R X
+    0x6D,   //S U
+    0x78,   //T
+    0x1C,   //U
+    0x00,   //V X
+    0x00,   //W X
+    0x00,   //X X
+    0x00,   //Y X
+    0x00    //Z X
+};

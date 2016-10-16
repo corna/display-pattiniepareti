@@ -1,0 +1,13 @@
+[Unit]
+Description=Control the display
+Requires=setup_pwm.service
+After=setup_pwm.service
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/display
+Restart=Always
+User=display
+
+[Install]
+WantedBy=multi-user.target

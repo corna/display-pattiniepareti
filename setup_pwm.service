@@ -1,0 +1,9 @@
+[Unit]
+Description=Setup the PWM
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/setup_pwm.sh
+
+[Install]
+WantedBy=multi-user.target
