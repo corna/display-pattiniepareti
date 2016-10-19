@@ -22,7 +22,7 @@
 
 #define SPI_SPEED 500000
 #define TEMP1_PATH "/sys/bus/w1/devices/28-000003aa674d/w1_slave"
-#define TEMP2_PATH "/sys/bus/w1/devices/28-000002e00a79/w1_slave"
+#define TEMP2_PATH "/sys/bus/w1/devices/28-0000052ba923/w1_slave"
 #define SPI_PATH "/dev/spidev0.1"
 #define PWM_PATH "/sys/class/pwm/pwmchip0/pwm0/"
 
@@ -36,7 +36,7 @@
 #define BRIGHTNESS_FULL 255
 #define BRIGHTNESS_POWERSAVE 2
 
-#define SHOW_ICE_TEMP_START 300
+#define SHOW_ICE_TEMP_START 250
 #define SHOW_ICE_TEMP_END 120
 
 char *temp_msgs[] = { " out", " ICE" };
