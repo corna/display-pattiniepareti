@@ -21,8 +21,8 @@
 #define DEGREES 4
 
 #define SPI_SPEED 500000
-#define TEMP1_PATH "/sys/bus/w1/devices/28-000003aa674d/w1_slave"
-#define TEMP2_PATH "/sys/bus/w1/devices/28-0000052ba923/w1_slave"
+#define MASTER1_PATH "/sys/bus/w1/devices/w1_bus_master1"
+#define MASTER2_PATH "/sys/bus/w1/devices/w1_bus_master2"
 #define SPI_PATH "/dev/spidev0.1"
 #define PWM_PATH "/sys/class/pwm/pwmchip0/pwm0/"
 
@@ -39,15 +39,49 @@
 #define SHOW_ICE_TEMP_START 250
 #define SHOW_ICE_TEMP_END 120
 
+#define PATH_SIZE 128
+
 char *temp_msgs[] = { " out", " ICE" };
-char *temp_paths[] = { TEMP1_PATH, TEMP2_PATH };
 
 typedef struct
 {
-    const char *path;
+    char path[PATH_SIZE];
     long temperature;
     bool ended;
 } temp_data;
+
+bool getW1SlavePath(const char *master_path, char *first_slave_path)
+{
+    bool status = false;
+    FILE *fd;
+    char path[PATH_SIZE];
+    unsigned int len;
+
+    strncpy(path, master_path, PATH_SIZE - 1);
+    strncat(path, "/w1_master_slaves", PATH_SIZE - 1);
+    fd = fopen(path, "r");
+
+    if (fd > 0)
+    {
+        strncpy(first_slave_path, master_path, PATH_SIZE - 1);
+        strncat(first_slave_path, "/", PATH_SIZE - 1);
+        len = strlen(first_slave_path);
+
+        if (fgets(first_slave_path + len, PATH_SIZE - len - 1, fd)) {
+
+            len = strlen(first_slave_path);
+            if (first_slave_path[len - 1] == '\n')
+                first_slave_path[len - 1] = '\0';
+
+            strncat(first_slave_path, "/w1_slave", PATH_SIZE - 1);
+            status = true;
+        }
+
+        fclose(fd);
+    }
+
+    return status;
+}
 
 bool displayWrite(const char text[4], const char extra, const char* filename)
 {
@@ -110,7 +144,7 @@ bool displayBrightness(uint8_t brightness)
     char buf[16];
     char *end;
     unsigned int period;
-    
+
     if (fd > 0)
     {
         if (read(fd, buf, 15) > 0)
@@ -118,7 +152,7 @@ bool displayBrightness(uint8_t brightness)
             period = strtol(buf, &end, 10);
             success = (buf != end);
         }
-        
+
         close(fd);
     }
 
@@ -126,11 +160,11 @@ bool displayBrightness(uint8_t brightness)
     {
         success = false;
         fd = open(PWM_PATH "duty_cycle", O_WRONLY);
-        
+
         if (fd > 0)
         {
             int len = sprintf(buf, "%u", period * brightness / 255);
-            
+
             if (len > 0)
             {
                 success = (write(fd, buf, len) == len);
@@ -139,7 +173,7 @@ bool displayBrightness(uint8_t brightness)
             close(fd);
         }
     }
-    
+
     return success;
 }
 
@@ -151,13 +185,13 @@ void *readTemp(void *data)
     char *endpos;
 
     ((temp_data *)data)->temperature = LONG_MAX;
-    
+
     if (fd > 0)
     {
         if (read(fd, buf, 127) > 0)
         {
             pos = strstr(buf, "YES");
-            
+
             if (pos)
             {
                 pos = strstr(pos, "t=");
@@ -190,7 +224,7 @@ bool powerSave()
     char buffer[8];
     char *end;
     long minutes;
-    
+
     time(&rawtime);
     strftime(buffer, 7, "%H", localtime(&rawtime));
     minutes = strtol(buffer, &end, 10) * 60;
@@ -205,7 +239,7 @@ bool powerSave()
             return (minutes < POWERSAVE_END || minutes > POWERSAVE_START);
         }
     }
-    
+
     return false;
 }
 
@@ -215,16 +249,16 @@ bool showIceTemp()
     char buffer[8];
     char *end;
     long days;
-    
+
     time(&rawtime);
     strftime(buffer, 7, "%j", localtime(&rawtime));
     days = strtol(buffer, &end, 10);
-    
+
     if (end != buffer)
     {
         return (days < SHOW_ICE_TEMP_END || days > SHOW_ICE_TEMP_START);
     }
-    
+
     return false;
 }
 
@@ -234,22 +268,25 @@ int main(void)
     char str[8];
     time_t rawtime;
     pthread_t temp_pthreads[2];
-    temp_data temp_datas[2] = { {temp_paths[0], LONG_MAX}, {temp_paths[1], LONG_MAX} };
+    temp_data temp_datas[2];
 
     while(true)
     {
         uint8_t colon_on = COLON;
 
+        getW1SlavePath(MASTER1_PATH, temp_datas[0].path);
+        getW1SlavePath(MASTER2_PATH, temp_datas[1].path);
+
         if (powerSave())
             displayBrightness(BRIGHTNESS_POWERSAVE);
         else
             displayBrightness(BRIGHTNESS_FULL);
-        
+
         if (showIceTemp())
             temp_num = 2;
         else
             temp_num = 1;
-        
+
         for (unsigned int i = 0; i < temp_num; i++)
         {
             temp_datas[i].ended = false;
@@ -260,7 +297,7 @@ int main(void)
                 temp_datas[i].temperature = LONG_MAX;
             }
         }
-        
+
         for (unsigned int i = 0; i < TIME_DURATION * 2; i++)
         {
             struct timespec half_sec = {0, 500000000};
@@ -278,7 +315,7 @@ int main(void)
         displayWrite(str, DOT, SPI_PATH);
 
         sleep(DATA_DURATION);
-        
+
         for (unsigned int i = 0; i < temp_num; i++)
         {
             displayWrite(temp_msgs[i], 0, SPI_PATH);
@@ -297,10 +334,10 @@ int main(void)
                 {
                     fprintf(stderr, "Thread %d can't be canceled\n", i);
                 }
-                
+
                 temp_datas[i].temperature = LONG_MAX;
             }
-            
+
             if (temp_datas[i].temperature != LONG_MAX)
             {
                 sprintf(str, "%+04ld", temp_datas[i].temperature / 100);
