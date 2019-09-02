@@ -20,7 +20,7 @@
 #define DOT 2
 #define DEGREES 4
 
-#define SPI_SPEED 500000
+#define SPI_SPEED 250000
 #define MASTER1_PATH "/sys/bus/w1/devices/w1_bus_master1"
 #define MASTER2_PATH "/sys/bus/w1/devices/w1_bus_master2"
 #define SPI_PATH "/dev/spidev0.1"
