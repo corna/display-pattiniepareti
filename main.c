@@ -20,7 +20,7 @@
 #define DOT 2
 #define DEGREES 4
 
-#define SPI_SPEED 250000
+#define SPI_SPEED 125000
 #define MASTER1_PATH "/sys/bus/w1/devices/w1_bus_master1"
 #define MASTER2_PATH "/sys/bus/w1/devices/w1_bus_master2"
 #define SPI_PATH "/dev/spidev0.1"
@@ -86,6 +86,7 @@ bool getW1SlavePath(const char *master_path, char *first_slave_path)
 bool displayWrite(const char text[4], const char extra, const char* filename)
 {
     static int fd = 0;
+    uint32_t speed = SPI_SPEED;
     uint8_t out[4];
 
     for (unsigned int i = 0; i < 4; i++)
@@ -121,8 +122,8 @@ bool displayWrite(const char text[4], const char extra, const char* filename)
 
         if (fd > 0)
         {
-            if (!ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, SPI_SPEED))
-                printf("Can't set SPI speed to %d", SPI_SPEED);
+            if (!ioctl(fd, SPI_IOC_WR_MAX_SPEED_HZ, &speed))
+                printf("Can't set SPI speed to %d", speed);
         }
     }
 

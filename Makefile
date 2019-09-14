@@ -1,6 +1,6 @@
 CC=gcc
-LIBS=-pthread
-EXTRA=-std=gnu99
+LIBS=-lpthread
+EXTRA=
 PREFIX=/usr/local
 
 all:
