@@ -5,7 +5,7 @@ After=setup_pwm.service
 
 [Service]
 Type=simple
-ExecStart=/usr/local/bin/display
+ExecStart=/usr/local/bin/display-pattiniepareti
 Restart=always
 User=display
 

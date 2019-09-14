@@ -4,10 +4,10 @@ EXTRA=
 PREFIX=/usr/local
 
 all:
-	$(CC) $(EXTRA) $(LIBS) -o display main.c
+	$(CC) $(EXTRA) $(LIBS) -o display-pattiniepareti main.c
 
 install:
-	cp display $(PREFIX)/bin/
+	cp display-pattiniepareti $(PREFIX)/bin/
 
 clean:
-	rm -f *.o ./display
+	rm -f *.o ./display-pattiniepareti
