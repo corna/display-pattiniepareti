@@ -23,7 +23,7 @@
 #define SPI_SPEED 125000
 #define MASTER1_PATH "/sys/bus/w1/devices/w1_bus_master1"
 #define MASTER2_PATH "/sys/bus/w1/devices/w1_bus_master2"
-#define SPI_PATH "/dev/spidev0.1"
+#define SPI_PATH "/dev/spidev0.0"
 #define PWM_PATH "/sys/class/pwm/pwmchip0/pwm0/"
 
 #define TIME_DURATION 5
